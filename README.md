@@ -2,7 +2,7 @@
 How to run -
 1) Run the java project using terminal
 2) Go to http://localhost:8080/
-3) Enter your query and hit submmit
+3) Enter your query and hit submit
 
 Resources folder contains a txt file that has multiple test cases(positive and negative).
 
