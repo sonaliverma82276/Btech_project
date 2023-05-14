@@ -1,0 +1,169 @@
+positive cases
+
+1. SELECT details.auditorium_id, details.name as aud_name,details.incharge_id, ud.first_name, ud.middle_name, ud.last_name, ud.dept_id, dept.name as dept_name FROM DETAILS_TABLE as details INNER JOIN user_details as ud ON details.incharge_id = ud.id INNER JOIN departments as dept ON ud.dept_id = dept.id WHERE 1;
+
+2.
+SELECT details.auditorium_id, details.name,
+details.incharge_id, ud.first_name, ud.middle_name, ud.last_name, ud.dept_id, dept.name 
+FROM DETAILS_TABLE as details 
+INNER JOIN user_details as ud 
+ON details.incharge_id = ud.id 
+INNER JOIN departments as dept 
+ON ud.dept_id = dept.id 
+WHERE details.auditorium_id = dept.aud_id and details.auditorium_id = dept.aud_id ;
+
+3.
+select * from `no_dues_hs_payment` a inner join `no_dues_hs_details` b on b.id = a.hs_no_dues_id inner join `no_dues_hs_individual` c on c.id = b.assign_hs_no_dues_id where c.admn_no='".$user_id."' and a.payment_status='".$payment_status."' and a.status='".$status."' or a.status = '".$status_new."'
+
+4.
+SELECT 
+a.id,
+a.name,
+a.sex,
+a.dept_id,
+a.email personal_email,
+a.photopath,
+b.course_id,
+d.duration,
+b.branch_id,
+b.enrollment_year,
+c.father_name,
+d.course_name,
+e.branch_name,
+f.dept_name,
+g.email,
+g.email2,
+h.address
+FROM user_details as a 
+JOIN stu_academic as b ON a.id=b.admn_no
+JOIN user_other_details as c ON a.id=c.id
+JOIN cbcs_courses as d ON b.course_id=d.id
+JOIN cbcs_branches as e ON b.branch_id=e.id
+JOIN cbcs_departments as f ON a.dept_id=f.id
+JOIN emaildata as g ON a.id=g.admission_no
+JOIN user_address as h on a.id=h.id
+JOIN users as i on a.id=i.id 
+
+5.
+SELECT vb.*,x.domain_name
+FROM vehicle_booking vb
+JOIN (
+SELECT a.emp_id,a.domain_name
+FROM emaildata_emp a UNION ALL
+SELECT a.admission_no AS emp_id,a.domain_name
+FROM emaildata a)x ON vb.emp_no=x.emp_id
+WHERE vb.id=?
+LIMIT 1;
+
+6.
+SELECT a.id, a.name, c.name, d.name, e.name, a.photopath,b.course_id,d.duration*2 ,f.`status`
+FROM user_details as a
+INNER JOIN stu_academic as b ON b.admn_no=a.id
+INNER JOIN departments as c ON c.id=a.dept_id
+LEFT JOIN cbcs_courses as d ON d.id=b.course_id
+LEFT JOIN cbcs_branches as e ON e.id=b.branch_id
+INNER JOIN users as f ON f.id=a.id 
+WHERE a.id = ?;
+
+7.
+SELECT a.admn_no,a.hostel_name,b.inventory_amount,c.payment_status, c.status
+FROM no_dues_hs_individual as a INNER JOIN no_dues_hs_details as b ON a.id = b.assign_hs_no_dues_id INNER JOIN no_dues_hs_payment as c ON c.hs_no_dues_id = b.id
+WHERE a.admn_no = ? AND a.is_deleted = 0;
+
+8.
+SELECT a.map_id,a.emp_no AS teacher_id,a.sub_id FROM subject_mapping_des as a
+inner join subject_mapping as b on a.map_id=b.map_id
+inner join fb_student_subject_desc as c on c.sub_id=a.sub_id
+inner join fb_student_subject_main as d on d.id=c.main_id 
+
+9.
+SELECT t.ref_id, t.ref_id,t.emp_no,t.leave_type,ud.salutation,ud.first_name,ud.middle_name,ud.last_name,t.leave_type,t.email_from,t.email_to,t.sent_date,t.mail_status
+ FROM leave_mail_send as t
+INNER JOIN user_details as ud ON t.emp_no=ud.id
+INNER JOIN departments as dpt ON ud.dept_id=dpt.id
+INNER JOIN emp_basic_details as ebs ON t.emp_no=ebs.emp_no
+INNER JOIN designations as desg ON ebs.designation=desg.id
+WHERE t.mail_status = desg.id
+GROUP BY t.ref_id
+ORDER BY t.emp_no
+
+//other queries for testing
+1.
+SELECT ProductName
+  FROM Product 
+WHERE Id IN (SELECT c.* FROM Customers as c, Orders as o, OrderDetails as od 
+where o.CustomerID=c.CustomerID AND o.OrderID=od.OrderID)
+
+2.
+SELECT
+  s.storeID ,
+  s.storeName ,
+  p.productID ,
+  p.productName ,
+  p.productPrice ,
+  e.employeeID ,
+  e.employeeName ,
+  e.employeeSalary ,
+FROM stores AS s 
+LEFT JOIN products AS p ON p.fk_store_id = s.storeID
+LEFT JOIN employees AS e ON e.fk_store_id = s.storeID;
+
+3.
+SELECT c.* FROM Customers as c, Orders as o, OrderDetails as od 
+where o.CustomerID=c.CustomerID AND o.OrderID=od.OrderID;
+
+Negative cases
+1.SELECT c.warning_status FROM exam_held_time as a JOIN final_semwise_marks_foil_freezed as b ON b.session_yr=a.syear AND a.`session`=b.`session` LEFT JOIN academic_warning_performance as c ON b.session_yr=c.session_year AND b.session`=c.session AND b.admn_no=c.admn_no WHERE b.admn_no=$admn_no AND a.result_sequence < (SELECT result_sequence FROM exam_held_time WHERE syear=$session_year AND SESSION =$session AND SESSION != Summer AND exam_type='R' ) GROUP BY b.semester,b.session_yr,b.`session` ORDER BY a.result_sequence DESC LIMIT 1;
+
+2.SELECT ud.first_name, ud.middle_name, ud.last_name, t.book_from, t.book_to, t.purpose, d.name as dept_name, t.status, t.id FROM departments as d, STATUS_TABLE as t INNER JOIN user_details as ud ON ud.id = t.applier_id WHERE t.applier_id LIKE '$applier_id' AND t.auditorium_id LIKE '$aud_id' AND ud.dept_id = d.id AND UNIX_TIMESTAMP(t.book_from) &gt;= '$unix_ts' AND t.status LIKE '$status' AND ud.dept_id LIKE '$dept_id' AND t.approver_id = '$auth_id';
+
+3.SELECT a.id, CONCAT_WS(' ',a.salutation,a.first_name,a.middle_name,a.last_name) `name`, a.sex, a.dept_id, a.email personal_email, a.photopath, b.course_id,d.duration+1 duration, b.branch_id, 
+		  b.enrollment_year,j.applied_for,c.father_name, d.`name` AS course_name, e.`name` AS branch_name, f.`name` AS dept_name, g.domain_name AS email, g.present_email AS email2,CONCAT_WS(' ',h.line1,h.line2,h.city,h.state,h.country,h.pincode) as address,(SELECT NAME FROM cbcs_departments WHERE id=j.opt_dept_id) opt_dept_name
+		  FROM user_details a 
+		  JOIN stu_academic b ON a.id=b.admn_no 
+		  JOIN user_other_details c ON a.id=c.id 
+		  JOIN cbcs_courses d ON b.course_id=d.id 
+		  JOIN cbcs_branches e ON b.branch_id=e.id 
+		  JOIN cbcs_departments f ON a.dept_id=f.id 
+		  JOIN emaildata g ON a.id=g.admission_no 
+		  JOIN user_address h on a.id=h.id and h.type='permanent' 
+		  JOIN users i on a.id=i.id 
+		  JOIN major_minor_dual_final j ON a.id=j.admn_no
+		  WHERE a.id=? and i.status='A' AND applied_for in ('doublemajor','dualdegree_categoryA','dualdegree_categoryB','dualdegree_categoryC') and j.status='1'
+4.SELECT B.admn_no, CONCAT_WS(' ',ud.first_name,ud.middle_name,ud.last_name) AS stu_name,d.id AS sub_id,e.name,e.subject_id,B.honours,B.honour_hod_status,B.honours_agg_id
+FROM ( SELECT hf1.admn_no, hf1.honours,hf1.honour_hod_status,hf1.honours_agg_id,rgf.form_id
+FROM hm_form hf1
+inner join  reg_regular_form rgf on rgf.admn_no=hf1.admn_no and rgf.session_year=? and rgf.semester=? and rgf.`session`=? and  rgf.hod_status<>? and rgf.acad_status<>?   
+ and hf1.honours=? and hf1.honour_hod_status=? and  hf1.dept_id=?  and  hf1.semester>=? and hf1.semester<=? " . $replacer1 . ")B
+INNER JOIN stu_academic ON stu_academic.admn_no=B.admn_no AND stu_academic.branch_id=?
+INNER JOIN user_details ud ON ud.id=B.admn_no
+INNER JOIN course_structure d ON d.aggr_id=B.honours_agg_id AND d.semester=?
+INNER JOIN subjects e ON e.id=d.id AND e.`type`=? 
+INNER JOIN  reg_regular_elective_opted opt ON opt.form_id=B.form_id  and opt.sub_id=d.id;
+
+5. SELECT tt.admn_no,tt.session_year,tt.session,CONCAT_WS(' ', e.first_name , e.middle_name , e.last_name) AS stu_name ,f.mobile_no,g.name AS 'department',tt.course_id,c.name AS course,tt.branch_id, d.name AS branch,tt.semester,tt.payment_status,tt.email_id,tt.fee_status FROM
+(SELECT a.admn_no ,a.session_year , a.`session` ,a.course_id,a.branch_id,a.semester, b.payment_status ,b.email_id,
+case
+	when b.payment_status='1' then 'PAID'
+	when b.payment_status='0' then 'UNPAID'
+END AS fee_status
+FROM reg_regular_form a
+INNER JOIN(bank_fee_details b)
+ON a.session_year=b.session_year AND a.`session`=b.`session` AND a.admn_no=b.admn_no
+WHERE a.session_year=? AND a.`session`=? AND a.acad_status='1' AND a.hod_status='1' GROUP BY a.admn_no)
+AS tt
+INNER JOIN (cbcs_courses c,cbcs_branches d, user_details e,user_other_details f,cbcs_departments g)          
+ON c.id= tt.course_id AND d.id=tt.branch_id AND tt.admn_no=e.id AND tt.admn_no=f.id AND e.dept_id=g.id
+WHERE e.dept_id=? ;
+
+6. select x.*,y.* from (select c.sub_id,c.faculty_id,b.subject_id,cs.aggr_id from fb_student_subject_main as a 
+inner join fb_student_subject_desc as c on c.main_id=a.id inner join subjects as b on b.id=c.sub_id
+inner join course_structure as cs on cs.id=b.id
+where a.session_year=? and a.`session`=?
+and a.admn_no=? and a.semester=?  and b.elective<>0) x
+inner join (SELECT a.map_id,a.emp_no AS teacher_id, subjects.subject_id,b.aggr_id
+FROM subject_mapping_des as a 
+INNER JOIN subject_mapping as b ON a.map_id=b.map_id
+INNER JOIN subjects as subjects ON  a.sub_id =subjects.id
+WHERE  b.session_year=?  AND b.`session`=?   and subjects.elective<>0 and a.emp_no<>0)y
+  on x.subject_id=y.subject_id and y.aggr_id=x.aggr_id and x.faculty_id=y.teacher_id ;
