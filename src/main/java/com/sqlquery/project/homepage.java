@@ -16,11 +16,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import java.io.File; 
-import java.util.*;
 
 import java.io.*;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 @Controller
 public class homepage {
@@ -86,18 +83,6 @@ public class homepage {
     @PostMapping("/upload")
     public String handleFileUpload(@RequestParam("file") MultipartFile file, Model model) throws IOException, ParserConfigurationException, SAXException {
 
-        // try (ZipInputStream zipInputStream = new ZipInputStream(file.getInputStream())) {
-        //     ZipEntry entry;
-        //     while ((entry = zipInputStream.getNextEntry()) != null) {
-        //         // Extract only directories
-        //         if (entry.isDirectory()) {
-        //             String directoryName = entry.getName();
-        //             System.out.println("Extracted directory: " + directoryName);
-        //             // Perform further processing on the directory as needed
-        //         }
-        //     }
-        // }
-
         mergeXML merge=new mergeXML();
         mergeXML.main(null,zipextractor.extractDirectoryFromZip(file));
         File cur_file = new File( "D:\\Project_sqlquery\\project\\src\\main\\java\\com\\sqlquery\\project\\dbinstances.xml"); 
@@ -139,8 +124,7 @@ public class homepage {
 
                             if(cur_res.equals("null")) { 
                                 curres="<p style='color:red'>This Query cannot be processed for now!</p><br>";
-                                // model.addAttribute("query", "<p style='color:red'>This Query cannot be processed for now!</p><br>");
-                                // return "home";
+                               
                             } 
                             result+=cur_res+" <br> ";
                             int pos=split.j-1;
@@ -148,8 +132,6 @@ public class homepage {
                             String alias_paren=ProjectApplication.getNextWord(query, paren_pos.getValue());
                             if( alias_paren!="" && !sql_keyword.is_keyword(alias_paren)) {
                                 curres="<p style='color:red'>This Query cannot be processed for now!</p><br>";
-                                // model.addAttribute("query", "<p style='color:red'>This Query cannot be processed for now!</p><br>");
-                                // return "home";
                             }
                             query=query.replace("("+subquery+")", "temp_table"+pos);
                             paren_pos=ProjectApplication.solve_parenthesis(query);
@@ -157,8 +139,6 @@ public class homepage {
                         String cur_res=split.main(null, query);
                         if(cur_res.equals("null")) { 
                             curres="<p style='color:red'>This Query cannot be processed for now!</p><br>";
-                                // model.addAttribute("query", "<p style='color:red'>This Query cannot be processed for now!</p><br>");
-                                // return "home";
                         }
                         
                         result+=cur_res;
@@ -170,40 +150,7 @@ public class homepage {
             }
         }
 
-        // Save the uploaded zip file to disk
-        // File tempFile = File.createTempFile("temp", ".zip");
-        // FileOutputStream fos = new FileOutputStream(tempFile);
-        // fos.write(file.getBytes());
-        // fos.close();
-
-        // // Unzip the file and read each entry
-        // FileInputStream fis = new FileInputStream(tempFile);
-        // ZipInputStream zis = new ZipInputStream(fis);
-
-        // ZipEntry entry;
-        // while ((entry = zis.getNextEntry()) != null) {
-        //     // Read the file contents
-        //     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        //     byte[] buffer = new byte[1024];
-        //     int count;
-        //     while ((count = zis.read(buffer)) != -1) {
-        //         baos.write(buffer, 0, count);
-        //     }
-
-        //     // Print the contents of the file
-        //     String contents = baos.toString();
-        //     // System.out.println(contents);
-
-        //     // Close the ByteArrayOutputStream
-        //     baos.close();
-        // }
-
-        // // Close the ZipInputStream and FileInputStream
-        // zis.close();
-        // fis.close();
-
-        // // Delete the temporary file
-        // tempFile.delete();
+        
         model.addAttribute("query", finalres);
         return "fileuploadform";
     }
