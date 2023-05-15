@@ -22,7 +22,7 @@
 	</button>
 	<div class="collapse navbar-collapse" id="navbarResponsive">
 		<ul class="navbar-nav ml-auto">
-			<li class="nav-item active"> <a class="ab" href="/fileupload">File Upload Form </a></li>
+			<li class="nav-item active"> <a class="ab" href="/">Single Query Form</a></li>
        <li class="nav-item "><a class="ab" href="#contact">Contact</a></li>
 		</ul>
 	</div>
@@ -30,12 +30,11 @@
 </nav>
 
 <!--Form-->
-    <form method="post" action="/" class="form" id="form">
+    <form method="post" action="/upload" class="form" id="form" enctype="multipart/form-data">
         <!-- <label for="query">Query:</label> -->
         <!-- <input type="text" name="query" id="query"> -->
         <label for="query">Enter your Query:</label>
-        <textarea type="text" id="query" name="query" rows="4" cols="100"></textarea>
-		<!-- <input type="file" name="file" accept=".zip"> -->
+		<input type="file" name="file" accept=".zip">
 
         <button type="submit" id="submit">Submit</button>
     </form>

@@ -1,0 +1,879 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><mapper>
+<select>
+SELECT details.auditorium_id, details.name as aud_name,details.incharge_id, ud.first_name, ud.middle_name, ud.last_name, ud.dept_id, dept.name as dept_name FROM DETAILS_TABLE as details INNER JOIN user_details as ud ON details.incharge_id = ud.id INNER JOIN departments as dept ON ud.dept_id = dept.id WHERE 1;
+</select>
+<select>
+SELECT details.auditorium_id, details.name,
+details.incharge_id, ud.first_name, ud.middle_name, ud.last_name, ud.dept_id, dept.name 
+FROM DETAILS_TABLE as details 
+INNER JOIN user_details as ud 
+ON details.incharge_id = ud.id 
+INNER JOIN departments as dept 
+ON ud.dept_id = dept.id 
+WHERE details.auditorium_id = dept.aud_id and details.auditorium_id = dept.aud_id ;
+</select>
+<select>
+SELECT 
+a.id,
+a.name,
+a.sex,
+a.dept_id,
+a.email personal_email,
+a.photopath,
+b.course_id,
+d.duration,
+b.branch_id,
+b.enrollment_year,
+c.father_name,
+d.course_name,
+e.branch_name,
+f.dept_name,
+g.email,
+g.email2,
+h.address
+FROM user_details as a 
+JOIN stu_academic as b ON a.id=b.admn_no
+JOIN user_other_details as c ON a.id=c.id
+JOIN cbcs_courses as d ON b.course_id=d.id
+JOIN cbcs_branches as e ON b.branch_id=e.id
+JOIN cbcs_departments as f ON a.dept_id=f.id
+JOIN emaildata as g ON a.id=g.admission_no
+JOIN user_address as h on a.id=h.id
+JOIN users as i on a.id=i.id 
+</select>
+<select>
+SELECT vb.*,x.domain_name
+FROM vehicle_booking vb
+JOIN (
+SELECT a.emp_id,a.domain_name
+FROM emaildata_emp a UNION ALL
+SELECT a.admission_no AS emp_id,a.domain_name
+FROM emaildata a)x ON vb.emp_no=x.emp_id
+WHERE vb.id=?
+LIMIT 1;
+</select>
+<select>
+SELECT a.id, a.name, c.name, d.name, e.name, a.photopath,b.course_id,d.duration*2 ,f.`status`
+FROM user_details as a
+INNER JOIN stu_academic as b ON b.admn_no=a.id
+INNER JOIN departments as c ON c.id=a.dept_id
+LEFT JOIN cbcs_courses as d ON d.id=b.course_id
+LEFT JOIN cbcs_branches as e ON e.id=b.branch_id
+INNER JOIN users as f ON f.id=a.id 
+WHERE a.id = ?;
+</select>
+<select>
+SELECT a.admn_no,a.hostel_name,b.inventory_amount,c.payment_status, c.status
+FROM no_dues_hs_individual as a INNER JOIN no_dues_hs_details as b ON a.id = b.assign_hs_no_dues_id INNER JOIN no_dues_hs_payment as c ON c.hs_no_dues_id = b.id
+WHERE a.admn_no = ? AND a.is_deleted = 0;
+</select>
+<select>
+SELECT a.map_id,a.emp_no AS teacher_id,a.sub_id FROM subject_mapping_des as a
+inner join subject_mapping as b on a.map_id=b.map_id
+inner join fb_student_subject_desc as c on c.sub_id=a.sub_id
+inner join fb_student_subject_main as d on d.id=c.main_id 
+</select>
+<select>
+SELECT t.ref_id, t.ref_id,t.emp_no,t.leave_type,ud.salutation,ud.first_name,ud.middle_name,ud.last_name,t.leave_type,t.email_from,t.email_to,t.sent_date,t.mail_status
+ FROM leave_mail_send as t
+INNER JOIN user_details as ud ON t.emp_no=ud.id
+INNER JOIN departments as dpt ON ud.dept_id=dpt.id
+INNER JOIN emp_basic_details as ebs ON t.emp_no=ebs.emp_no
+INNER JOIN designations as desg ON ebs.designation=desg.id
+WHERE t.mail_status = desg.id
+GROUP BY t.ref_id
+ORDER BY t.emp_no
+</select>
+<select>
+SELECT LAST_NAME
+FROM EMPLOYEES
+WHERE DEPARTMENT_ID IN
+(SELECT DEPARTMENT_ID
+FROM DEPARTMENTS
+WHERE LOCATION_ID IN
+(SELECT LOCATION_ID
+FROM LOCATIONS
+GROUP BY CITY
+HAVING MIN(SALARY)));
+</select>
+<select>
+SELECT ProductName
+  FROM Product 
+WHERE Id IN (SELECT c.* FROM Customers as c, Orders as o, OrderDetails as od 
+where o.CustomerID=c.CustomerID AND o.OrderID=od.OrderID)
+</select>
+<select>
+SELECT
+  s.storeID ,
+  s.storeName ,
+  p.productID ,
+  p.productName ,
+  p.productPrice ,
+  e.employeeID ,
+  e.employeeName ,
+  e.employeeSalary ,
+FROM stores AS s 
+LEFT JOIN products AS p ON p.fk_store_id = s.storeID
+LEFT JOIN employees AS e ON e.fk_store_id = s.storeID;
+</select>
+<select>
+SELECT c.* FROM Customers as c, Orders as o, OrderDetails as od 
+where o.CustomerID=c.CustomerID AND o.OrderID=od.OrderID;
+</select>
+<select id="getMarginAssetCoins" resultType="float">
+        SELECT assetCoins FROM marginwalletdb WHERE userId = #{userId} AND assetName = #{assetName}
+    </select><select id="findMarginWallet" resultMap="CrossMarginWalletResultMapper">
+        SELECT assetName, assetCoins FROM marginwalletdb WHERE userId = #{userId} AND assetName = #{assetName} 
+    </select><select id="findMarginAssetsForUser" resultMap="CrossMarginWalletResultMapper">
+        select assetName, assetCoins from marginwalletdb where userId = #{userId}
+    </select><select id="getBorrowedAssetCoins" resultType="float">
+        SELECT assetCoins FROM borrowedwalletdb WHERE userId = #{userId} AND assetName = #{assetName}
+    </select><select id="findBorrowWallet" resultMap="BorrowWalletResultMapper">
+        SELECT assetName, assetCoins, interest FROM borrowedwalletdb WHERE userId = #{userId} AND assetName = #{assetName}
+    </select><select id="findBorrowedAssetsForUser" resultMap="CrossMarginWalletResultMapper">
+        select assetName, assetCoins from borrowedwalletdb where userId = #{userId}
+    </select><insert id="addNewMarginWallet">
+        INSERT INTO marginwalletdb(userId,assetName, assetCoins) VALUES(#{userId}, #{assetName}, #{amountToBeAdded})
+    </insert><insert id="addNewBorrowedWallet">
+        INSERT INTO borrowedwalletdb(userId, assetName, assetCoins, interest) VALUES(#{userId}, #{assetName}, #{amountToBeAdded}, #{interest})
+    </insert><update id="transferFundtoMargin">
+    update spotwalletdb
+        SET spotwalletdb.assetCoins =  spotwalletdb.assetCoins - #{amountToBeTransferred}
+        WHERE spotwalletdb.userId = #{userId} AND spotwalletdb.assetName = #{assetName}
+
+        update marginwalletdb
+        SET marginwalletdb.assetCoins = marginwalletdb.assetCoins + #{amountToBeTransferred}
+        WHERE marginwalletdb.userId = #{userId} AND marginwalletdb.assetName = #{assetName}
+    </update><update id="transferFundtoSpot">
+    update spotwalletdb
+        SET spotwalletdb.assetCoins =  spotwalletdb.assetCoins + #{amountToBeTransferred}
+        WHERE spotwalletdb.userId = #{userId} AND spotwalletdb.assetName = #{assetName}
+
+        update marginwalletdb
+        SET marginwalletdb.assetCoins = marginwalletdb.assetCoins - #{amountToBeTransferred}
+        WHERE marginwalletdb.userId = #{userId} AND marginwalletdb.assetName = #{assetName}
+    </update><update id="updateInterest">
+        update borrowedwalletdb
+        SET borrowedwalletdb.interest = #{interest}
+        WHERE borrowedwalletdb.userId = #{userId} AND borrowedwalletdb.assetName = #{assetName}
+    </update><update id="borrowFund">
+        update marginwalletdb
+        SET marginwalletdb.assetCoins = marginwalletdb.assetCoins + #{amountToBeBorrowed}
+        WHERE marginwalletdb.userId = #{userId} AND marginwalletdb.assetName = #{assetName}
+
+        update borrowedwalletdb
+        SET borrowedwalletdb.assetCoins = borrowedwalletdb.assetCoins + #{amountToBeBorrowed}
+        WHERE borrowedwalletdb.userId = #{userId} AND borrowedwalletdb.assetName = #{assetName}
+
+
+    </update><update id="repayFund">
+        update borrowedwalletdb
+        SET borrowedwalletdb.interest = borrowedwalletdb.interest -#{interestRepaid}
+        WHERE borrowedwalletdb.userId = #{userId} AND borrowedwalletdb.assetName = #{assetName}
+
+        update borrowedwalletdb
+        SET borrowedwalletdb.assetCoins = borrowedwalletdb.assetCoins - #{amountToBeRepaid}
+        WHERE borrowedwalletdb.userId = #{userId} AND borrowedwalletdb.assetName = #{assetName}
+
+        update marginwalletdb
+        SET marginwalletdb.assetCoins = marginwalletdb.assetCoins - #{amountToBeRepaid}
+        WHERE marginwalletdb.userId = #{userId} AND marginwalletdb.assetName = #{assetName}
+    </update><update id="liquidateMarginWallet">
+        update marginwalletdb
+        SET marginwalletdb.assetCoins = 0
+        WHERE marginwalletdb.userId = #{userId}
+
+        update marginwalletdb
+        SET marginwalletdb.assetCoins = #{newMarginWalletValue}
+        WHERE marginwalletdb.userId = #{userId} AND marginwalletdb.assetName = #{assetName}
+
+        update borrowedwalletdb
+        SET borrowedwalletdb.assetCoins = 0 , borrowedwalletdb.interest=0
+        WHERE borrowedwalletdb.userId = #{userId}
+    </update><select id="getAllAssetsAvail" resultMap="AssetAvail" resultType="deshaw.dae.descrypto.domain.AssetsAvail">
+        select *
+        from assets A
+        left join asset_market M
+        on M.asset_id = A.asset_id
+    </select><select id="getAssetByid" parameterType="java.lang.String" resultMap="AssetAvail">
+        select *
+        from assets A
+        left join asset_market M
+        on M.asset_id = A.asset_id
+        where symbol = #{assetID}
+    </select><select id="getAllTradingPairsAvail" resultMap="PairsAvail">
+        select * from pairs
+    </select><select id="getTradingPairbyId" parameterType="java.lang.String" resultMap="PairsAvail">
+        select * from pairs where symbol = #{symb}
+    </select><select id="allUserOrdersbyPair" resultMap="OrderBookEntry">
+        select amount, limitPrice from orders
+        where orderPair=#{orderPair} and (orderStatus='open' OR orderStatus='partially_filled')
+    </select><select id="allUserBuyOrdersbyPair" resultMap="OrderBookEntry">
+        select amount, limitPrice from orders
+        where orderPair=#{orderPair} and (orderStatus='open' OR orderStatus='partially_filled') and
+        side = 'buy'
+    </select><select id="allUserSellOrdersbyPair" resultMap="OrderBookEntry">
+        select amount, limitPrice from orders
+        where orderPair=#{orderPair} and (orderStatus='open' OR orderStatus='partially_filled') and
+        side = 'sell'
+    </select><select id="orderHistory" resultMap="OrderResultMap">
+        select * from orders
+        where userId=#{userId}
+        <if test="data.orderId != null">
+            AND orderId = #{data.orderId}
+        </if>
+        <if test="data.orderPair != null">
+            AND orders.orderPair=#{data.orderPair}
+        </if>
+        <if test="data.orderStatus !=null ">
+            AND orders.orderStatus=#{data.orderStatus}
+        </if>
+        <if test="data.startTime !=null and data.endTime !=null ">
+            AND orders.timestamp BETWEEN #{data.startTime} and #{data.endTime}
+        </if>
+
+    </select><select id="openOrders" resultMap="OrderResultMap">
+        select * from orders
+        where (orderStatus='open' OR orderStatus='partially_filled' ) AND side=#{side} AND orderPair=#{pair}
+    </select><select id="getOrder" resultMap="OrderResultMap">
+        select * from orders
+        where orderId=#{orderId}
+    </select><insert id="placeOrder" keyColumn="orderId" keyProperty="orderId" parameterType="deshaw.dae.descrypto.domain.Order" useGeneratedKeys="true">
+        insert into orders(userId,tradingType,orderPair,amount,limitPrice,orderType,orderStatus,filled,total,average,side)
+        values(#{userId},#{tradingType},#{orderPair},#{amount},
+        #{limitPrice},#{orderType},#{orderStatus},#{filled},#{total},#{average},#{side})
+
+    </insert><update id="updateOrder" parameterType="deshaw.dae.descrypto.domain.Order">
+        UPDATE orders
+        SET orderStatus = #{orderStatus}, filled = #{filled}, average = #{average}, total = #{total}
+        WHERE orders.orderId = #{orderId}
+    </update><update id="cancelOrder">
+        UPDATE orders
+        SET orderStatus = 'cancelled'
+        WHERE orders.orderId = #{orderId} AND orderStatus!='filled'
+    </update><insert id="updatePortfolioWorth">
+        INSERT INTO portfolioworthdb(totalWorth, userId) VALUES( #{totalWorth}, #{userId})
+    </insert><select id="tradeHistory" resultMap="tradeResultMap">
+        select *
+        from trades
+        INNER JOIN orders
+        ON (trades.buy_orderId=orders.orderId AND orders.side='buy' ) or (trades.sell_orderId=orders.orderId AND orders.side='sell' )
+        where orders.userId=#{userId}
+        <if test="data.orderId != null">
+            AND orders.orderId=#{data.orderId}
+        </if>
+        <if test="data.orderPair != null">
+            AND orders.orderPair=#{data.orderPair}
+        </if>
+        <if test="data.startTime !=null and data.endTime !=null ">
+            AND trades.timestamp BETWEEN #{data.startTime} and #{data.endTime}
+        </if>
+    </select><insert id="createTrade" keyColumn="tradeId" keyProperty="tradeId" parameterType="deshaw.dae.descrypto.domain.Trade" useGeneratedKeys="true">
+        insert into trades(filled,total,price,buy_orderId,sell_orderId,timestamp)
+        values(#{filled},#{total},
+        #{price},#{buy_Id},#{sell_Id},#{timestamp})
+    </insert><select id="findByUserName" resultMap="BaseResultMap">
+        select userName,password, userId from userdb where userName=#{userName}
+    </select><select id="findByUserId" resultMap="BaseResultMap">
+        select fullName,password,totalWorth from userdb where userId=#{userId}
+    </select><select id="getAllUsers" resultMap="BaseResultMap">
+        SELECT * FROM userdb;
+    </select><select id="getMarginRatio" resultType="float">
+        SELECT marginRatio from userdb WHERE userId=#{userId}
+    </select><insert id="addUser" keyColumn="userId" keyProperty="userId" parameterType="deshaw.dae.descrypto.domain.User" useGeneratedKeys="true">
+
+       insert into userdb( firstName, middleName, lastName, userName, email, password, phoneNo, pancardNo, dob, nationality, marginRatio)
+        values ( #{firstName},#{middleName}, #{lastName}, #{userName}, #{email}, #{password}, #{phoneNo}, #{pancardNo}, #{dob}, #{nationality}, #{marginRatio})
+
+    </insert><update id="updateMarginRatio">
+        update userdb
+        SET userdb.marginRatio = #{newMarginRatio}
+        WHERE userId = #{userId}
+    </update><select id="findAssetsForUser" resultMap="WalletResultMapper">
+        select assetName, assetCoins from spotwalletdb where userId = #{userId}
+    </select><select id="getAssetCoins" resultType="float">
+        SELECT assetCoins FROM spotwalletdb WHERE userId = #{userId} AND assetName = #{assetName}
+    </select><select id="findWallet" resultMap="WalletResultMapper">
+        SELECT assetName, assetCoins FROM spotwalletdb WHERE userId = #{userId} AND assetName = #{assetName}
+    </select><select id="fundsInfo" resultMap="FundsInfoMapper">
+        SELECT assetName, assetCoins FROM spotwalletdb WHERE userId = #{userId}
+    </select><insert id="addNewWallet">
+        INSERT INTO spotwalletdb(userId,assetName, assetCoins) VALUES(#{userId}, #{assetName}, #{amountToBeAdded})
+    </insert><update id="addFund">
+        update spotwalletdb
+        SET spotwalletdb.assetCoins = spotwalletdb.assetCoins + #{amountToBeAdded}
+        WHERE spotwalletdb.userId = #{userId} AND spotwalletdb.assetName = #{assetName}
+    </update><update id="withdrawFund">
+        update spotwalletdb
+        SET spotwalletdb.assetCoins =  spotwalletdb.assetCoins - #{withdrawalAmount}
+        WHERE spotwalletdb.userId = #{userId} AND spotwalletdb.assetName = #{assetName}
+    </update><update id="removeAsset">
+        DELETE FROM spotwalletdb WHERE userId = #{userId} AND assetName = #{assetName}
+    </update><select id="getMarginAssetCoins" resultType="float">
+        SELECT assetCoins FROM marginwalletdb WHERE userId = #{userId} AND assetName = #{assetName}
+    </select><select id="findMarginWallet" resultMap="CrossMarginWalletResultMapper">
+        SELECT assetName, assetCoins FROM marginwalletdb WHERE userId = #{userId} AND assetName = #{assetName} 
+    </select><select id="findMarginAssetsForUser" resultMap="CrossMarginWalletResultMapper">
+        select assetName, assetCoins from marginwalletdb where userId = #{userId}
+    </select><select id="getBorrowedAssetCoins" resultType="float">
+        SELECT assetCoins FROM borrowedwalletdb WHERE userId = #{userId} AND assetName = #{assetName}
+    </select><select id="findBorrowWallet" resultMap="BorrowWalletResultMapper">
+        SELECT assetName, assetCoins, interest FROM borrowedwalletdb WHERE userId = #{userId} AND assetName = #{assetName}
+    </select><select id="findBorrowedAssetsForUser" resultMap="CrossMarginWalletResultMapper">
+        select assetName, assetCoins from borrowedwalletdb where userId = #{userId}
+    </select><insert id="addNewMarginWallet">
+        INSERT INTO marginwalletdb(userId,assetName, assetCoins) VALUES(#{userId}, #{assetName}, #{amountToBeAdded})
+    </insert><insert id="addNewBorrowedWallet">
+        INSERT INTO borrowedwalletdb(userId, assetName, assetCoins, interest) VALUES(#{userId}, #{assetName}, #{amountToBeAdded}, #{interest})
+    </insert><update id="transferFundtoMargin">
+    update spotwalletdb
+        SET spotwalletdb.assetCoins =  spotwalletdb.assetCoins - #{amountToBeTransferred}
+        WHERE spotwalletdb.userId = #{userId} AND spotwalletdb.assetName = #{assetName}
+
+        update marginwalletdb
+        SET marginwalletdb.assetCoins = marginwalletdb.assetCoins + #{amountToBeTransferred}
+        WHERE marginwalletdb.userId = #{userId} AND marginwalletdb.assetName = #{assetName}
+    </update><update id="transferFundtoSpot">
+    update spotwalletdb
+        SET spotwalletdb.assetCoins =  spotwalletdb.assetCoins + #{amountToBeTransferred}
+        WHERE spotwalletdb.userId = #{userId} AND spotwalletdb.assetName = #{assetName}
+
+        update marginwalletdb
+        SET marginwalletdb.assetCoins = marginwalletdb.assetCoins - #{amountToBeTransferred}
+        WHERE marginwalletdb.userId = #{userId} AND marginwalletdb.assetName = #{assetName}
+    </update><update id="updateInterest">
+        update borrowedwalletdb
+        SET borrowedwalletdb.interest = #{interest}
+        WHERE borrowedwalletdb.userId = #{userId} AND borrowedwalletdb.assetName = #{assetName}
+    </update><update id="borrowFund">
+        update marginwalletdb
+        SET marginwalletdb.assetCoins = marginwalletdb.assetCoins + #{amountToBeBorrowed}
+        WHERE marginwalletdb.userId = #{userId} AND marginwalletdb.assetName = #{assetName}
+
+        update borrowedwalletdb
+        SET borrowedwalletdb.assetCoins = borrowedwalletdb.assetCoins + #{amountToBeBorrowed}
+        WHERE borrowedwalletdb.userId = #{userId} AND borrowedwalletdb.assetName = #{assetName}
+
+
+    </update><update id="repayFund">
+        update borrowedwalletdb
+        SET borrowedwalletdb.interest = borrowedwalletdb.interest -#{interestRepaid}
+        WHERE borrowedwalletdb.userId = #{userId} AND borrowedwalletdb.assetName = #{assetName}
+
+        update borrowedwalletdb
+        SET borrowedwalletdb.assetCoins = borrowedwalletdb.assetCoins - #{amountToBeRepaid}
+        WHERE borrowedwalletdb.userId = #{userId} AND borrowedwalletdb.assetName = #{assetName}
+
+        update marginwalletdb
+        SET marginwalletdb.assetCoins = marginwalletdb.assetCoins - #{amountToBeRepaid}
+        WHERE marginwalletdb.userId = #{userId} AND marginwalletdb.assetName = #{assetName}
+    </update><update id="liquidateMarginWallet">
+        update marginwalletdb
+        SET marginwalletdb.assetCoins = 0
+        WHERE marginwalletdb.userId = #{userId}
+
+        update marginwalletdb
+        SET marginwalletdb.assetCoins = #{newMarginWalletValue}
+        WHERE marginwalletdb.userId = #{userId} AND marginwalletdb.assetName = #{assetName}
+
+        update borrowedwalletdb
+        SET borrowedwalletdb.assetCoins = 0 , borrowedwalletdb.interest=0
+        WHERE borrowedwalletdb.userId = #{userId}
+    </update><select id="getAllAssetsAvail" resultMap="AssetAvail" resultType="deshaw.dae.descrypto.domain.AssetsAvail">
+        select *
+        from assets A
+        left join asset_market M
+        on M.asset_id = A.asset_id
+    </select><select id="getAssetByid" parameterType="java.lang.String" resultMap="AssetAvail">
+        select *
+        from assets A
+        left join asset_market M
+        on M.asset_id = A.asset_id
+        where symbol = #{assetID}
+    </select><select id="getAllTradingPairsAvail" resultMap="PairsAvail">
+        select * from pairs
+    </select><select id="getTradingPairbyId" parameterType="java.lang.String" resultMap="PairsAvail">
+        select * from pairs where symbol = #{symb}
+    </select><select id="allUserOrdersbyPair" resultMap="OrderBookEntry">
+        select amount, limitPrice from orders
+        where orderPair=#{orderPair} and (orderStatus='open' OR orderStatus='partially_filled')
+    </select><select id="allUserBuyOrdersbyPair" resultMap="OrderBookEntry">
+        select amount, limitPrice from orders
+        where orderPair=#{orderPair} and (orderStatus='open' OR orderStatus='partially_filled') and
+        side = 'buy'
+    </select><select id="allUserSellOrdersbyPair" resultMap="OrderBookEntry">
+        select amount, limitPrice from orders
+        where orderPair=#{orderPair} and (orderStatus='open' OR orderStatus='partially_filled') and
+        side = 'sell'
+    </select><select id="orderHistory" resultMap="OrderResultMap">
+        select * from orders
+        where userId=#{userId}
+        <if test="data.orderId != null">
+            AND orderId = #{data.orderId}
+        </if>
+        <if test="data.orderPair != null">
+            AND orders.orderPair=#{data.orderPair}
+        </if>
+        <if test="data.orderStatus !=null ">
+            AND orders.orderStatus=#{data.orderStatus}
+        </if>
+        <if test="data.startTime !=null and data.endTime !=null ">
+            AND orders.timestamp BETWEEN #{data.startTime} and #{data.endTime}
+        </if>
+
+    </select><select id="openOrders" resultMap="OrderResultMap">
+        select * from orders
+        where (orderStatus='open' OR orderStatus='partially_filled' ) AND side=#{side} AND orderPair=#{pair}
+    </select><select id="getOrder" resultMap="OrderResultMap">
+        select * from orders
+        where orderId=#{orderId}
+    </select><insert id="placeOrder" keyColumn="orderId" keyProperty="orderId" parameterType="deshaw.dae.descrypto.domain.Order" useGeneratedKeys="true">
+        insert into orders(userId,tradingType,orderPair,amount,limitPrice,orderType,orderStatus,filled,total,average,side)
+        values(#{userId},#{tradingType},#{orderPair},#{amount},
+        #{limitPrice},#{orderType},#{orderStatus},#{filled},#{total},#{average},#{side})
+
+    </insert><update id="updateOrder" parameterType="deshaw.dae.descrypto.domain.Order">
+        UPDATE orders
+        SET orderStatus = #{orderStatus}, filled = #{filled}, average = #{average}, total = #{total}
+        WHERE orders.orderId = #{orderId}
+    </update><update id="cancelOrder">
+        UPDATE orders
+        SET orderStatus = 'cancelled'
+        WHERE orders.orderId = #{orderId} AND orderStatus!='filled'
+    </update><insert id="updatePortfolioWorth">
+        INSERT INTO portfolioworthdb(totalWorth, userId) VALUES( #{totalWorth}, #{userId})
+    </insert><select id="tradeHistory" resultMap="tradeResultMap">
+        select *
+        from trades
+        INNER JOIN orders
+        ON (trades.buy_orderId=orders.orderId AND orders.side='buy' ) or (trades.sell_orderId=orders.orderId AND orders.side='sell' )
+        where orders.userId=#{userId}
+        <if test="data.orderId != null">
+            AND orders.orderId=#{data.orderId}
+        </if>
+        <if test="data.orderPair != null">
+            AND orders.orderPair=#{data.orderPair}
+        </if>
+        <if test="data.startTime !=null and data.endTime !=null ">
+            AND trades.timestamp BETWEEN #{data.startTime} and #{data.endTime}
+        </if>
+    </select><insert id="createTrade" keyColumn="tradeId" keyProperty="tradeId" parameterType="deshaw.dae.descrypto.domain.Trade" useGeneratedKeys="true">
+        insert into trades(filled,total,price,buy_orderId,sell_orderId,timestamp)
+        values(#{filled},#{total},
+        #{price},#{buy_Id},#{sell_Id},#{timestamp})
+    </insert><select id="findByUserName" resultMap="BaseResultMap">
+        select userName,password, userId from userdb where userName=#{userName}
+    </select><select id="findByUserId" resultMap="BaseResultMap">
+        select fullName,password,totalWorth from userdb where userId=#{userId}
+    </select><select id="getAllUsers" resultMap="BaseResultMap">
+        SELECT * FROM userdb;
+    </select><select id="getMarginRatio" resultType="float">
+        SELECT marginRatio from userdb WHERE userId=#{userId}
+    </select><insert id="addUser" keyColumn="userId" keyProperty="userId" parameterType="deshaw.dae.descrypto.domain.User" useGeneratedKeys="true">
+
+       insert into userdb( firstName, middleName, lastName, userName, email, password, phoneNo, pancardNo, dob, nationality, marginRatio)
+        values ( #{firstName},#{middleName}, #{lastName}, #{userName}, #{email}, #{password}, #{phoneNo}, #{pancardNo}, #{dob}, #{nationality}, #{marginRatio})
+
+    </insert><update id="updateMarginRatio">
+        update userdb
+        SET userdb.marginRatio = #{newMarginRatio}
+        WHERE userId = #{userId}
+    </update><select id="findAssetsForUser" resultMap="WalletResultMapper">
+        select assetName, assetCoins from spotwalletdb where userId = #{userId}
+    </select><select id="getAssetCoins" resultType="float">
+        SELECT assetCoins FROM spotwalletdb WHERE userId = #{userId} AND assetName = #{assetName}
+    </select><select id="findWallet" resultMap="WalletResultMapper">
+        SELECT assetName, assetCoins FROM spotwalletdb WHERE userId = #{userId} AND assetName = #{assetName}
+    </select><select id="fundsInfo" resultMap="FundsInfoMapper">
+        SELECT assetName, assetCoins FROM spotwalletdb WHERE userId = #{userId}
+    </select><insert id="addNewWallet">
+        INSERT INTO spotwalletdb(userId,assetName, assetCoins) VALUES(#{userId}, #{assetName}, #{amountToBeAdded})
+    </insert><update id="addFund">
+        update spotwalletdb
+        SET spotwalletdb.assetCoins = spotwalletdb.assetCoins + #{amountToBeAdded}
+        WHERE spotwalletdb.userId = #{userId} AND spotwalletdb.assetName = #{assetName}
+    </update><update id="withdrawFund">
+        update spotwalletdb
+        SET spotwalletdb.assetCoins =  spotwalletdb.assetCoins - #{withdrawalAmount}
+        WHERE spotwalletdb.userId = #{userId} AND spotwalletdb.assetName = #{assetName}
+    </update><update id="removeAsset">
+        DELETE FROM spotwalletdb WHERE userId = #{userId} AND assetName = #{assetName}
+    </update><select id="getMarginAssetCoins" resultType="float">
+        SELECT assetCoins FROM marginwalletdb WHERE userId = #{userId} AND assetName = #{assetName}
+    </select><select id="findMarginWallet" resultMap="CrossMarginWalletResultMapper">
+        SELECT assetName, assetCoins FROM marginwalletdb WHERE userId = #{userId} AND assetName = #{assetName} 
+    </select><select id="findMarginAssetsForUser" resultMap="CrossMarginWalletResultMapper">
+        select assetName, assetCoins from marginwalletdb where userId = #{userId}
+    </select><select id="getBorrowedAssetCoins" resultType="float">
+        SELECT assetCoins FROM borrowedwalletdb WHERE userId = #{userId} AND assetName = #{assetName}
+    </select><select id="findBorrowWallet" resultMap="BorrowWalletResultMapper">
+        SELECT assetName, assetCoins, interest FROM borrowedwalletdb WHERE userId = #{userId} AND assetName = #{assetName}
+    </select><select id="findBorrowedAssetsForUser" resultMap="CrossMarginWalletResultMapper">
+        select assetName, assetCoins from borrowedwalletdb where userId = #{userId}
+    </select><insert id="addNewMarginWallet">
+        INSERT INTO marginwalletdb(userId,assetName, assetCoins) VALUES(#{userId}, #{assetName}, #{amountToBeAdded})
+    </insert><insert id="addNewBorrowedWallet">
+        INSERT INTO borrowedwalletdb(userId, assetName, assetCoins, interest) VALUES(#{userId}, #{assetName}, #{amountToBeAdded}, #{interest})
+    </insert><update id="transferFundtoMargin">
+    update spotwalletdb
+        SET spotwalletdb.assetCoins =  spotwalletdb.assetCoins - #{amountToBeTransferred}
+        WHERE spotwalletdb.userId = #{userId} AND spotwalletdb.assetName = #{assetName}
+
+        update marginwalletdb
+        SET marginwalletdb.assetCoins = marginwalletdb.assetCoins + #{amountToBeTransferred}
+        WHERE marginwalletdb.userId = #{userId} AND marginwalletdb.assetName = #{assetName}
+    </update><update id="transferFundtoSpot">
+    update spotwalletdb
+        SET spotwalletdb.assetCoins =  spotwalletdb.assetCoins + #{amountToBeTransferred}
+        WHERE spotwalletdb.userId = #{userId} AND spotwalletdb.assetName = #{assetName}
+
+        update marginwalletdb
+        SET marginwalletdb.assetCoins = marginwalletdb.assetCoins - #{amountToBeTransferred}
+        WHERE marginwalletdb.userId = #{userId} AND marginwalletdb.assetName = #{assetName}
+    </update><update id="updateInterest">
+        update borrowedwalletdb
+        SET borrowedwalletdb.interest = #{interest}
+        WHERE borrowedwalletdb.userId = #{userId} AND borrowedwalletdb.assetName = #{assetName}
+    </update><update id="borrowFund">
+        update marginwalletdb
+        SET marginwalletdb.assetCoins = marginwalletdb.assetCoins + #{amountToBeBorrowed}
+        WHERE marginwalletdb.userId = #{userId} AND marginwalletdb.assetName = #{assetName}
+
+        update borrowedwalletdb
+        SET borrowedwalletdb.assetCoins = borrowedwalletdb.assetCoins + #{amountToBeBorrowed}
+        WHERE borrowedwalletdb.userId = #{userId} AND borrowedwalletdb.assetName = #{assetName}
+
+
+    </update><update id="repayFund">
+        update borrowedwalletdb
+        SET borrowedwalletdb.interest = borrowedwalletdb.interest -#{interestRepaid}
+        WHERE borrowedwalletdb.userId = #{userId} AND borrowedwalletdb.assetName = #{assetName}
+
+        update borrowedwalletdb
+        SET borrowedwalletdb.assetCoins = borrowedwalletdb.assetCoins - #{amountToBeRepaid}
+        WHERE borrowedwalletdb.userId = #{userId} AND borrowedwalletdb.assetName = #{assetName}
+
+        update marginwalletdb
+        SET marginwalletdb.assetCoins = marginwalletdb.assetCoins - #{amountToBeRepaid}
+        WHERE marginwalletdb.userId = #{userId} AND marginwalletdb.assetName = #{assetName}
+    </update><update id="liquidateMarginWallet">
+        update marginwalletdb
+        SET marginwalletdb.assetCoins = 0
+        WHERE marginwalletdb.userId = #{userId}
+
+        update marginwalletdb
+        SET marginwalletdb.assetCoins = #{newMarginWalletValue}
+        WHERE marginwalletdb.userId = #{userId} AND marginwalletdb.assetName = #{assetName}
+
+        update borrowedwalletdb
+        SET borrowedwalletdb.assetCoins = 0 , borrowedwalletdb.interest=0
+        WHERE borrowedwalletdb.userId = #{userId}
+    </update><select id="getAllAssetsAvail" resultMap="AssetAvail" resultType="deshaw.dae.descrypto.domain.AssetsAvail">
+        select *
+        from assets A
+        left join asset_market M
+        on M.asset_id = A.asset_id
+    </select><select id="getAssetByid" parameterType="java.lang.String" resultMap="AssetAvail">
+        select *
+        from assets A
+        left join asset_market M
+        on M.asset_id = A.asset_id
+        where symbol = #{assetID}
+    </select><select id="getAllTradingPairsAvail" resultMap="PairsAvail">
+        select * from pairs
+    </select><select id="getTradingPairbyId" parameterType="java.lang.String" resultMap="PairsAvail">
+        select * from pairs where symbol = #{symb}
+    </select><select id="allUserOrdersbyPair" resultMap="OrderBookEntry">
+        select amount, limitPrice from orders
+        where orderPair=#{orderPair} and (orderStatus='open' OR orderStatus='partially_filled')
+    </select><select id="allUserBuyOrdersbyPair" resultMap="OrderBookEntry">
+        select amount, limitPrice from orders
+        where orderPair=#{orderPair} and (orderStatus='open' OR orderStatus='partially_filled') and
+        side = 'buy'
+    </select><select id="allUserSellOrdersbyPair" resultMap="OrderBookEntry">
+        select amount, limitPrice from orders
+        where orderPair=#{orderPair} and (orderStatus='open' OR orderStatus='partially_filled') and
+        side = 'sell'
+    </select><select id="orderHistory" resultMap="OrderResultMap">
+        select * from orders
+        where userId=#{userId}
+        <if test="data.orderId != null">
+            AND orderId = #{data.orderId}
+        </if>
+        <if test="data.orderPair != null">
+            AND orders.orderPair=#{data.orderPair}
+        </if>
+        <if test="data.orderStatus !=null ">
+            AND orders.orderStatus=#{data.orderStatus}
+        </if>
+        <if test="data.startTime !=null and data.endTime !=null ">
+            AND orders.timestamp BETWEEN #{data.startTime} and #{data.endTime}
+        </if>
+
+    </select><select id="openOrders" resultMap="OrderResultMap">
+        select * from orders
+        where (orderStatus='open' OR orderStatus='partially_filled' ) AND side=#{side} AND orderPair=#{pair}
+    </select><select id="getOrder" resultMap="OrderResultMap">
+        select * from orders
+        where orderId=#{orderId}
+    </select><insert id="placeOrder" keyColumn="orderId" keyProperty="orderId" parameterType="deshaw.dae.descrypto.domain.Order" useGeneratedKeys="true">
+        insert into orders(userId,tradingType,orderPair,amount,limitPrice,orderType,orderStatus,filled,total,average,side)
+        values(#{userId},#{tradingType},#{orderPair},#{amount},
+        #{limitPrice},#{orderType},#{orderStatus},#{filled},#{total},#{average},#{side})
+
+    </insert><update id="updateOrder" parameterType="deshaw.dae.descrypto.domain.Order">
+        UPDATE orders
+        SET orderStatus = #{orderStatus}, filled = #{filled}, average = #{average}, total = #{total}
+        WHERE orders.orderId = #{orderId}
+    </update><update id="cancelOrder">
+        UPDATE orders
+        SET orderStatus = 'cancelled'
+        WHERE orders.orderId = #{orderId} AND orderStatus!='filled'
+    </update><insert id="updatePortfolioWorth">
+        INSERT INTO portfolioworthdb(totalWorth, userId) VALUES( #{totalWorth}, #{userId})
+    </insert><select id="tradeHistory" resultMap="tradeResultMap">
+        select *
+        from trades
+        INNER JOIN orders
+        ON (trades.buy_orderId=orders.orderId AND orders.side='buy' ) or (trades.sell_orderId=orders.orderId AND orders.side='sell' )
+        where orders.userId=#{userId}
+        <if test="data.orderId != null">
+            AND orders.orderId=#{data.orderId}
+        </if>
+        <if test="data.orderPair != null">
+            AND orders.orderPair=#{data.orderPair}
+        </if>
+        <if test="data.startTime !=null and data.endTime !=null ">
+            AND trades.timestamp BETWEEN #{data.startTime} and #{data.endTime}
+        </if>
+    </select><insert id="createTrade" keyColumn="tradeId" keyProperty="tradeId" parameterType="deshaw.dae.descrypto.domain.Trade" useGeneratedKeys="true">
+        insert into trades(filled,total,price,buy_orderId,sell_orderId,timestamp)
+        values(#{filled},#{total},
+        #{price},#{buy_Id},#{sell_Id},#{timestamp})
+    </insert><select id="findByUserName" resultMap="BaseResultMap">
+        select userName,password, userId from userdb where userName=#{userName}
+    </select><select id="findByUserId" resultMap="BaseResultMap">
+        select fullName,password,totalWorth from userdb where userId=#{userId}
+    </select><select id="getAllUsers" resultMap="BaseResultMap">
+        SELECT * FROM userdb;
+    </select><select id="getMarginRatio" resultType="float">
+        SELECT marginRatio from userdb WHERE userId=#{userId}
+    </select><insert id="addUser" keyColumn="userId" keyProperty="userId" parameterType="deshaw.dae.descrypto.domain.User" useGeneratedKeys="true">
+
+       insert into userdb( firstName, middleName, lastName, userName, email, password, phoneNo, pancardNo, dob, nationality, marginRatio)
+        values ( #{firstName},#{middleName}, #{lastName}, #{userName}, #{email}, #{password}, #{phoneNo}, #{pancardNo}, #{dob}, #{nationality}, #{marginRatio})
+
+    </insert><update id="updateMarginRatio">
+        update userdb
+        SET userdb.marginRatio = #{newMarginRatio}
+        WHERE userId = #{userId}
+    </update><select id="findAssetsForUser" resultMap="WalletResultMapper">
+        select assetName, assetCoins from spotwalletdb where userId = #{userId}
+    </select><select id="getAssetCoins" resultType="float">
+        SELECT assetCoins FROM spotwalletdb WHERE userId = #{userId} AND assetName = #{assetName}
+    </select><select id="findWallet" resultMap="WalletResultMapper">
+        SELECT assetName, assetCoins FROM spotwalletdb WHERE userId = #{userId} AND assetName = #{assetName}
+    </select><select id="fundsInfo" resultMap="FundsInfoMapper">
+        SELECT assetName, assetCoins FROM spotwalletdb WHERE userId = #{userId}
+    </select><insert id="addNewWallet">
+        INSERT INTO spotwalletdb(userId,assetName, assetCoins) VALUES(#{userId}, #{assetName}, #{amountToBeAdded})
+    </insert><update id="addFund">
+        update spotwalletdb
+        SET spotwalletdb.assetCoins = spotwalletdb.assetCoins + #{amountToBeAdded}
+        WHERE spotwalletdb.userId = #{userId} AND spotwalletdb.assetName = #{assetName}
+    </update><update id="withdrawFund">
+        update spotwalletdb
+        SET spotwalletdb.assetCoins =  spotwalletdb.assetCoins - #{withdrawalAmount}
+        WHERE spotwalletdb.userId = #{userId} AND spotwalletdb.assetName = #{assetName}
+    </update><update id="removeAsset">
+        DELETE FROM spotwalletdb WHERE userId = #{userId} AND assetName = #{assetName}
+    </update><select id="getMarginAssetCoins" resultType="float">
+        SELECT assetCoins FROM marginwalletdb WHERE userId = #{userId} AND assetName = #{assetName}
+    </select><select id="findMarginWallet" resultMap="CrossMarginWalletResultMapper">
+        SELECT assetName, assetCoins FROM marginwalletdb WHERE userId = #{userId} AND assetName = #{assetName} 
+    </select><select id="findMarginAssetsForUser" resultMap="CrossMarginWalletResultMapper">
+        select assetName, assetCoins from marginwalletdb where userId = #{userId}
+    </select><select id="getBorrowedAssetCoins" resultType="float">
+        SELECT assetCoins FROM borrowedwalletdb WHERE userId = #{userId} AND assetName = #{assetName}
+    </select><select id="findBorrowWallet" resultMap="BorrowWalletResultMapper">
+        SELECT assetName, assetCoins, interest FROM borrowedwalletdb WHERE userId = #{userId} AND assetName = #{assetName}
+    </select><select id="findBorrowedAssetsForUser" resultMap="CrossMarginWalletResultMapper">
+        select assetName, assetCoins from borrowedwalletdb where userId = #{userId}
+    </select><insert id="addNewMarginWallet">
+        INSERT INTO marginwalletdb(userId,assetName, assetCoins) VALUES(#{userId}, #{assetName}, #{amountToBeAdded})
+    </insert><insert id="addNewBorrowedWallet">
+        INSERT INTO borrowedwalletdb(userId, assetName, assetCoins, interest) VALUES(#{userId}, #{assetName}, #{amountToBeAdded}, #{interest})
+    </insert><update id="transferFundtoMargin">
+    update spotwalletdb
+        SET spotwalletdb.assetCoins =  spotwalletdb.assetCoins - #{amountToBeTransferred}
+        WHERE spotwalletdb.userId = #{userId} AND spotwalletdb.assetName = #{assetName}
+
+        update marginwalletdb
+        SET marginwalletdb.assetCoins = marginwalletdb.assetCoins + #{amountToBeTransferred}
+        WHERE marginwalletdb.userId = #{userId} AND marginwalletdb.assetName = #{assetName}
+    </update><update id="transferFundtoSpot">
+    update spotwalletdb
+        SET spotwalletdb.assetCoins =  spotwalletdb.assetCoins + #{amountToBeTransferred}
+        WHERE spotwalletdb.userId = #{userId} AND spotwalletdb.assetName = #{assetName}
+
+        update marginwalletdb
+        SET marginwalletdb.assetCoins = marginwalletdb.assetCoins - #{amountToBeTransferred}
+        WHERE marginwalletdb.userId = #{userId} AND marginwalletdb.assetName = #{assetName}
+    </update><update id="updateInterest">
+        update borrowedwalletdb
+        SET borrowedwalletdb.interest = #{interest}
+        WHERE borrowedwalletdb.userId = #{userId} AND borrowedwalletdb.assetName = #{assetName}
+    </update><update id="borrowFund">
+        update marginwalletdb
+        SET marginwalletdb.assetCoins = marginwalletdb.assetCoins + #{amountToBeBorrowed}
+        WHERE marginwalletdb.userId = #{userId} AND marginwalletdb.assetName = #{assetName}
+
+        update borrowedwalletdb
+        SET borrowedwalletdb.assetCoins = borrowedwalletdb.assetCoins + #{amountToBeBorrowed}
+        WHERE borrowedwalletdb.userId = #{userId} AND borrowedwalletdb.assetName = #{assetName}
+
+
+    </update><update id="repayFund">
+        update borrowedwalletdb
+        SET borrowedwalletdb.interest = borrowedwalletdb.interest -#{interestRepaid}
+        WHERE borrowedwalletdb.userId = #{userId} AND borrowedwalletdb.assetName = #{assetName}
+
+        update borrowedwalletdb
+        SET borrowedwalletdb.assetCoins = borrowedwalletdb.assetCoins - #{amountToBeRepaid}
+        WHERE borrowedwalletdb.userId = #{userId} AND borrowedwalletdb.assetName = #{assetName}
+
+        update marginwalletdb
+        SET marginwalletdb.assetCoins = marginwalletdb.assetCoins - #{amountToBeRepaid}
+        WHERE marginwalletdb.userId = #{userId} AND marginwalletdb.assetName = #{assetName}
+    </update><update id="liquidateMarginWallet">
+        update marginwalletdb
+        SET marginwalletdb.assetCoins = 0
+        WHERE marginwalletdb.userId = #{userId}
+
+        update marginwalletdb
+        SET marginwalletdb.assetCoins = #{newMarginWalletValue}
+        WHERE marginwalletdb.userId = #{userId} AND marginwalletdb.assetName = #{assetName}
+
+        update borrowedwalletdb
+        SET borrowedwalletdb.assetCoins = 0 , borrowedwalletdb.interest=0
+        WHERE borrowedwalletdb.userId = #{userId}
+    </update><select id="getAllAssetsAvail" resultMap="AssetAvail" resultType="deshaw.dae.descrypto.domain.AssetsAvail">
+        select *
+        from assets A
+        left join asset_market M
+        on M.asset_id = A.asset_id
+    </select><select id="getAssetByid" parameterType="java.lang.String" resultMap="AssetAvail">
+        select *
+        from assets A
+        left join asset_market M
+        on M.asset_id = A.asset_id
+        where symbol = #{assetID}
+    </select><select id="getAllTradingPairsAvail" resultMap="PairsAvail">
+        select * from pairs
+    </select><select id="getTradingPairbyId" parameterType="java.lang.String" resultMap="PairsAvail">
+        select * from pairs where symbol = #{symb}
+    </select><select id="allUserOrdersbyPair" resultMap="OrderBookEntry">
+        select amount, limitPrice from orders
+        where orderPair=#{orderPair} and (orderStatus='open' OR orderStatus='partially_filled')
+    </select><select id="allUserBuyOrdersbyPair" resultMap="OrderBookEntry">
+        select amount, limitPrice from orders
+        where orderPair=#{orderPair} and (orderStatus='open' OR orderStatus='partially_filled') and
+        side = 'buy'
+    </select><select id="allUserSellOrdersbyPair" resultMap="OrderBookEntry">
+        select amount, limitPrice from orders
+        where orderPair=#{orderPair} and (orderStatus='open' OR orderStatus='partially_filled') and
+        side = 'sell'
+    </select><select id="orderHistory" resultMap="OrderResultMap">
+        select * from orders
+        where userId=#{userId}
+        <if test="data.orderId != null">
+            AND orderId = #{data.orderId}
+        </if>
+        <if test="data.orderPair != null">
+            AND orders.orderPair=#{data.orderPair}
+        </if>
+        <if test="data.orderStatus !=null ">
+            AND orders.orderStatus=#{data.orderStatus}
+        </if>
+        <if test="data.startTime !=null and data.endTime !=null ">
+            AND orders.timestamp BETWEEN #{data.startTime} and #{data.endTime}
+        </if>
+
+    </select><select id="openOrders" resultMap="OrderResultMap">
+        select * from orders
+        where (orderStatus='open' OR orderStatus='partially_filled' ) AND side=#{side} AND orderPair=#{pair}
+    </select><select id="getOrder" resultMap="OrderResultMap">
+        select * from orders
+        where orderId=#{orderId}
+    </select><insert id="placeOrder" keyColumn="orderId" keyProperty="orderId" parameterType="deshaw.dae.descrypto.domain.Order" useGeneratedKeys="true">
+        insert into orders(userId,tradingType,orderPair,amount,limitPrice,orderType,orderStatus,filled,total,average,side)
+        values(#{userId},#{tradingType},#{orderPair},#{amount},
+        #{limitPrice},#{orderType},#{orderStatus},#{filled},#{total},#{average},#{side})
+
+    </insert><update id="updateOrder" parameterType="deshaw.dae.descrypto.domain.Order">
+        UPDATE orders
+        SET orderStatus = #{orderStatus}, filled = #{filled}, average = #{average}, total = #{total}
+        WHERE orders.orderId = #{orderId}
+    </update><update id="cancelOrder">
+        UPDATE orders
+        SET orderStatus = 'cancelled'
+        WHERE orders.orderId = #{orderId} AND orderStatus!='filled'
+    </update><insert id="updatePortfolioWorth">
+        INSERT INTO portfolioworthdb(totalWorth, userId) VALUES( #{totalWorth}, #{userId})
+    </insert><select id="tradeHistory" resultMap="tradeResultMap">
+        select *
+        from trades
+        INNER JOIN orders
+        ON (trades.buy_orderId=orders.orderId AND orders.side='buy' ) or (trades.sell_orderId=orders.orderId AND orders.side='sell' )
+        where orders.userId=#{userId}
+        <if test="data.orderId != null">
+            AND orders.orderId=#{data.orderId}
+        </if>
+        <if test="data.orderPair != null">
+            AND orders.orderPair=#{data.orderPair}
+        </if>
+        <if test="data.startTime !=null and data.endTime !=null ">
+            AND trades.timestamp BETWEEN #{data.startTime} and #{data.endTime}
+        </if>
+    </select><insert id="createTrade" keyColumn="tradeId" keyProperty="tradeId" parameterType="deshaw.dae.descrypto.domain.Trade" useGeneratedKeys="true">
+        insert into trades(filled,total,price,buy_orderId,sell_orderId,timestamp)
+        values(#{filled},#{total},
+        #{price},#{buy_Id},#{sell_Id},#{timestamp})
+    </insert><select id="findByUserName" resultMap="BaseResultMap">
+        select userName,password, userId from userdb where userName=#{userName}
+    </select><select id="findByUserId" resultMap="BaseResultMap">
+        select fullName,password,totalWorth from userdb where userId=#{userId}
+    </select><select id="getAllUsers" resultMap="BaseResultMap">
+        SELECT * FROM userdb;
+    </select><select id="getMarginRatio" resultType="float">
+        SELECT marginRatio from userdb WHERE userId=#{userId}
+    </select><insert id="addUser" keyColumn="userId" keyProperty="userId" parameterType="deshaw.dae.descrypto.domain.User" useGeneratedKeys="true">
+
+       insert into userdb( firstName, middleName, lastName, userName, email, password, phoneNo, pancardNo, dob, nationality, marginRatio)
+        values ( #{firstName},#{middleName}, #{lastName}, #{userName}, #{email}, #{password}, #{phoneNo}, #{pancardNo}, #{dob}, #{nationality}, #{marginRatio})
+
+    </insert><update id="updateMarginRatio">
+        update userdb
+        SET userdb.marginRatio = #{newMarginRatio}
+        WHERE userId = #{userId}
+    </update><select id="findAssetsForUser" resultMap="WalletResultMapper">
+        select assetName, assetCoins from spotwalletdb where userId = #{userId}
+    </select><select id="getAssetCoins" resultType="float">
+        SELECT assetCoins FROM spotwalletdb WHERE userId = #{userId} AND assetName = #{assetName}
+    </select><select id="findWallet" resultMap="WalletResultMapper">
+        SELECT assetName, assetCoins FROM spotwalletdb WHERE userId = #{userId} AND assetName = #{assetName}
+    </select><select id="fundsInfo" resultMap="FundsInfoMapper">
+        SELECT assetName, assetCoins FROM spotwalletdb WHERE userId = #{userId}
+    </select><insert id="addNewWallet">
+        INSERT INTO spotwalletdb(userId,assetName, assetCoins) VALUES(#{userId}, #{assetName}, #{amountToBeAdded})
+    </insert><update id="addFund">
+        update spotwalletdb
+        SET spotwalletdb.assetCoins = spotwalletdb.assetCoins + #{amountToBeAdded}
+        WHERE spotwalletdb.userId = #{userId} AND spotwalletdb.assetName = #{assetName}
+    </update><update id="withdrawFund">
+        update spotwalletdb
+        SET spotwalletdb.assetCoins =  spotwalletdb.assetCoins - #{withdrawalAmount}
+        WHERE spotwalletdb.userId = #{userId} AND spotwalletdb.assetName = #{assetName}
+    </update><update id="removeAsset">
+        DELETE FROM spotwalletdb WHERE userId = #{userId} AND assetName = #{assetName}
+    </update></mapper>
